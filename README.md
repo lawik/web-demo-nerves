@@ -11,6 +11,16 @@ Sibling checkouts this expects:
 
 ## Build and run
 
+Host Erlang/Elixir are pinned in `mise.toml` (run through `mise exec --` or
+activate mise). Buildroot 2026.08 refuses the uutils `install` that Ubuntu 26.04
+ships, so put GNU coreutils first on PATH when the system has to be built:
+
+```sh
+mkdir -p ~/sprawl/.gnu-coreutils-bin
+for f in /usr/bin/gnu*; do ln -sf $f ~/sprawl/.gnu-coreutils-bin/$(basename ${f#/usr/bin/gnu}); done
+export PATH=~/sprawl/.gnu-coreutils-bin:$PATH
+```
+
 ```sh
 export MIX_TARGET=jslinux
 mix deps.get
