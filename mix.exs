@@ -9,8 +9,8 @@ defmodule WebDemoNerves.MixProject do
     [
       app: @app,
       version: @version,
-      elixir: "~> 1.19",
-      archives: [nerves_bootstrap: "~> 1.15"],
+      elixir: "~> 1.20",
+      archives: [nerves_bootstrap: "~> 1.17"],
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: [{@app, release()}]
@@ -31,13 +31,14 @@ defmodule WebDemoNerves.MixProject do
   defp deps do
     [
       # Dependencies for all targets
-      {:nerves, "~> 1.13", runtime: false},
-      {:shoehorn, "~> 0.9.1"},
-      {:ring_logger, "~> 0.11.0"},
-      {:toolshed, "~> 0.4.0"},
+      {:nerves, "~> 1.15", runtime: false},
+      {:shoehorn, "~> 0.9.3"},
+      {:logger_backends, "~> 1.0"},
+      {:ring_logger, "~> 0.11.7"},
+      {:toolshed, "~> 0.5.0"},
 
       # Allow Nerves.Runtime on host to support development, testing and CI.
-      {:nerves_runtime, "~> 0.13.12"},
+      {:nerves_runtime, "~> 0.13.13"},
 
       # Targets
       {:nerves_system_jslinux, path: "../nerves_system_jslinux", runtime: false, targets: :jslinux, nerves: [compile: true]}
