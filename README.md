@@ -12,13 +12,14 @@ Sibling checkouts this expects:
 ## Build and run
 
 Host Erlang/Elixir are pinned in `mise.toml` (run through `mise exec --` or
-activate mise). Buildroot 2026.08 refuses the uutils `install` that Ubuntu 26.04
-ships, so put GNU coreutils first on PATH when the system has to be built:
+activate mise). On Ubuntu 26.04 only, Buildroot 2026.08 refuses the uutils
+`install` it ships, so put GNU coreutils first on PATH when the system has to
+be built (24.04 and earlier need nothing):
 
 ```sh
-mkdir -p ~/sprawl/.gnu-coreutils-bin
-for f in /usr/bin/gnu*; do ln -sf $f ~/sprawl/.gnu-coreutils-bin/$(basename ${f#/usr/bin/gnu}); done
-export PATH=~/sprawl/.gnu-coreutils-bin:$PATH
+mkdir -p ~/.gnu-coreutils-bin
+for f in /usr/bin/gnu*; do ln -sf $f ~/.gnu-coreutils-bin/$(basename ${f#/usr/bin/gnu}); done
+export PATH=~/.gnu-coreutils-bin:$PATH
 ```
 
 ```sh
@@ -35,7 +36,9 @@ The `.fw` is a normal Nerves firmware file: `fwup -a -d disk.img -i ... -t compl
 writes an MBR, the U-Boot environment, A/B kernel slots, A/B rootfs partitions
 and an application partition, and `-t upgrade` updates the inactive slot. In
 the browser, OpenSBI and U-Boot boot the active slot from that disk image.
-There is no persistence across page loads: the disk lives in the browser's
-memory, so an upgrade applied inside the VM is lost on reload.
+What the guest writes to the disk is kept in the browser's IndexedDB, so the
+application partition and the firmware state survive a reload
+(`index.html?reset=1` starts over), and a reboot resets the emulated machine
+in place, so an upgrade applied inside the VM boots on the next reboot.
 
 `sample/` is an untouched `mix nerves.new` output kept for reference.
