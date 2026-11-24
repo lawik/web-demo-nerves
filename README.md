@@ -42,3 +42,17 @@ application partition and the firmware state survive a reload
 in place, so an upgrade applied inside the VM boots on the next reboot.
 
 `sample/` is an untouched `mix nerves.new` output kept for reference.
+
+## Networking (this branch)
+
+This branch adds vintage_net (DHCP on `eth0`), nerves_time and nerves_ssh,
+for the target only: vintage_net must not run on a development host. `eth0`
+exists when the page gives the machine a network, e.g.
+`index.html?wisp=ws://localhost:6001/` with a Wisp server running (see
+"Networking" in `../jsnerves/README.md`); add
+`&expose=ws://localhost:7001/` with a relay to reach nerves_ssh from a real
+`ssh` client. Without a network the firmware boots as before; eth0 just
+never appears.
+
+nerves_ssh authorizes the public keys in `~/.ssh` at build time, or only
+the file named by `NERVES_SSH_PUBKEY` if that is set.

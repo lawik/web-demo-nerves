@@ -40,6 +40,14 @@ defmodule WebDemoNerves.MixProject do
       # Allow Nerves.Runtime on host to support development, testing and CI.
       {:nerves_runtime, "~> 0.13.13"},
 
+      # Networking in the browser (see README): eth0 is a virtio-net device
+      # that only exists when the page gives the machine a network. Target
+      # only: vintage_net must never start on a development host.
+      {:vintage_net, "~> 0.13", targets: @all_targets},
+      {:vintage_net_ethernet, "~> 0.11", targets: @all_targets},
+      {:nerves_time, "~> 0.4", targets: @all_targets},
+      {:nerves_ssh, "~> 1.0", targets: @all_targets},
+
       # Targets
       {:nerves_system_jslinux, path: "../nerves_system_jslinux", runtime: false, targets: :jslinux, nerves: [compile: true]}
     ]
