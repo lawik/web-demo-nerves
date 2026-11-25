@@ -1,7 +1,27 @@
 # web_demo_nerves
 
-Minimal Nerves firmware for the `jslinux` target: Nerves running on a
-RISC-V machine emulated by TinyEMU, compiled to WebAssembly, in a browser.
+Nerves firmware for the `jslinux` target: Nerves running on a RISC-V machine
+emulated by TinyEMU, compiled to WebAssembly, in a browser.
+
+It is a `mix nerves.new` project (nerves_bootstrap 1.17.4) with these changes
+for the target:
+
+* `jslinux` is the only target, and its system is a path dependency built
+  from source.
+* No networking: the browser gives the machine no network, so instead of
+  `nerves_pack` it only has the part of it that is not networking,
+  `nerves_motd`. No vintage_net, mdns_lite, nerves_ssh or nerves_time, and
+  none of their configuration (SSH keys from `~/.ssh` included).
+* `config :nerves_runtime, fwup_timeout: 4_000`: fwup's ops.fw tasks get 4 s
+  instead of 1 s, since fwup starts slowly on the emulated CPU while the
+  system boots. No nerves_runtime release reads that setting yet (0.13.13 is
+  the latest), so nerves_runtime comes from git: upstream main plus a fix that
+  makes the setting reach the callers (`lawik/nerves_runtime`, branch
+  `fwup-timeout-app-env`). Back to Hex once a release has it.
+
+Everything else is the template: Toolshed and the MOTD in
+`rootfs_overlay/etc/iex.exs`, RingLogger, and the Nerves.Runtime startup
+guard, which validates new firmware once all applications have started.
 
 Sibling checkouts this expects:
 
@@ -28,7 +48,7 @@ mix deps.get
 mix firmware
 cd ../jsnerves
 ./extract_firmware.sh ../web-demo-nerves/_build/jslinux_dev/nerves/images/web_demo_nerves.fw \
-  ../nerves_system_jslinux/.nerves/artifacts/nerves_system_jslinux-portable-*/images
+  ../nerves_system_jslinux/.nerves/artifacts/nerves_system_jslinux-portable-$(cat ../nerves_system_jslinux/VERSION)/images
 python3 -m http.server 8000   # then open http://localhost:8000/index.html
 ```
 
@@ -41,4 +61,3 @@ application partition and the firmware state survive a reload
 (`index.html?reset=1` starts over), and a reboot resets the emulated machine
 in place, so an upgrade applied inside the VM boots on the next reboot.
 
-`sample/` is an untouched `mix nerves.new` output kept for reference.

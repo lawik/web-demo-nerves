@@ -1,7 +1,18 @@
 defmodule WebDemoNerves do
   @moduledoc """
-  Nerves web demo application.
-
-  This runs inside a browser-based RISC-V emulator via JSLinux/TinyEMU.
+  Documentation for `WebDemoNerves`.
   """
+
+  @doc """
+  Hello world.
+
+  ## Examples
+
+      iex> WebDemoNerves.hello()
+      :world
+
+  """
+  def hello do
+    :world
+  end
 end
