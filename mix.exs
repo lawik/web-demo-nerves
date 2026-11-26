@@ -43,12 +43,11 @@ defmodule WebDemoNerves.MixProject do
       # Allow Nerves.Runtime on host to support development, testing and CI.
       # See config/host.exs for usage.
       #
-      # From git until a release after 0.13.13 has a configurable fwup timeout
-      # (see config/target.exs); the commit is upstream main plus a fix that
-      # makes the configured value reach the callers.
+      # From upstream main until a release after 0.13.13 has its KV pass the
+      # configured fwup timeout to fwup (see config/target.exs).
       {:nerves_runtime,
-       github: "lawik/nerves_runtime",
-       ref: "b0b34d84255d8e657a3021404a042c3834b77735",
+       github: "nerves-project/nerves_runtime",
+       ref: "b53eaa9c730d02d40d6d8f9b1710cd871c4e6ff2",
        override: true},
 
       # Dependencies for all targets except :host

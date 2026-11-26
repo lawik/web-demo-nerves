@@ -12,12 +12,12 @@ for the target:
   `nerves_pack` it only has the part of it that is not networking,
   `nerves_motd`. No vintage_net, mdns_lite, nerves_ssh or nerves_time, and
   none of their configuration (SSH keys from `~/.ssh` included).
-* `config :nerves_runtime, fwup_timeout: 4_000`: fwup's ops.fw tasks get 4 s
-  instead of 1 s, since fwup starts slowly on the emulated CPU while the
-  system boots. No nerves_runtime release reads that setting yet (0.13.13 is
-  the latest), so nerves_runtime comes from git: upstream main plus a fix that
-  makes the setting reach the callers (`lawik/nerves_runtime`, branch
-  `fwup-timeout-app-env`). Back to Hex once a release has it.
+* `config :nerves_runtime, fwup_timeout: 4_000`: the firmware status read
+  when nerves_runtime's KV store first loads gets 4 s instead of 1 s, since
+  fwup starts slowly on the emulated CPU while the system boots. Only
+  nerves_runtime's main branch passes that setting on (commit b53eaa9;
+  0.13.13 is the latest release), so nerves_runtime comes from git. Back to
+  Hex once a release has it.
 
 Everything else is the template: Toolshed and the MOTD in
 `rootfs_overlay/etc/iex.exs`, RingLogger, and the Nerves.Runtime startup

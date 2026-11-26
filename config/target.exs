@@ -13,10 +13,9 @@ config :shoehorn, init: [:nerves_runtime]
 # way of validating that firmware is good.
 config :nerves_runtime, startup_guard_enabled: true
 
-# Give fwup's ops.fw tasks (the firmware status read when the KV store loads,
-# and the startup guard's validate) 4 s instead of 1 s: fwup starts slowly on
-# the emulated CPU while the system boots. Nerves.Runtime.KV waits at most 5 s
-# for an answer, so keep it below that.
+# Give the firmware status read when Nerves.Runtime.KV first loads 4 s instead
+# of 1 s: fwup starts slowly on the emulated CPU while the system boots.
+# Callers of the KV wait at most 5 s for it, so keep it below that.
 config :nerves_runtime, fwup_timeout: 4_000
 
 # Erlinit can be configured without a rootfs_overlay. See
