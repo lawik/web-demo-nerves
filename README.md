@@ -19,6 +19,14 @@ for the target:
   0.13.13 is the latest release), so nerves_runtime comes from git. Back to
   Hex once a release has it.
 
+* `WebDemoNerves.Board`: the board's LEDs, buttons and sensors, with
+  Circuits.GPIO and Circuits.I2C. The emulated machine has a virtio GPIO
+  controller and I2C adapter whose other side is the page (see Board in
+  `../jsnerves/README.md`): it lights `LED_SLOT_A` or `LED_SLOT_B` for the
+  running slot and `LED_READY` once the system is up, logs presses of
+  `BUTTON_1` to `BUTTON_3`, and `WebDemoNerves.Board.fps()` reads the page's
+  frame rate from the FPS sensor at I2C address `0x10`.
+
 Everything else is the template: Toolshed and the MOTD in
 `rootfs_overlay/etc/iex.exs`, RingLogger, and the Nerves.Runtime startup
 guard, which validates new firmware once all applications have started.
