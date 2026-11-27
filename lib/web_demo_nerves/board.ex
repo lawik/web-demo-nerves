@@ -20,6 +20,8 @@ defmodule WebDemoNerves.Board do
 
   * `0x10` - the frames per second the page renders: register 0 is an ID
     (`0x46`), registers 1-2 the rate in hundredths, big-endian. See `fps/0`.
+  * `0x51` - a mailbox the page reads: the firmware writes what it runs there
+    when it starts, and how an update goes. See `tell/2`.
   """
   use GenServer
   require Logger
@@ -31,6 +33,7 @@ defmodule WebDemoNerves.Board do
   @i2c_bus "i2c-0"
   @fps_address 0x10
   @fps_id 0x46
+  @mailbox_address 0x51
 
   @doc false
   def start_link(opts) do
@@ -54,6 +57,37 @@ defmodule WebDemoNerves.Board do
     end
   end
 
+  @doc """
+  Tell the page something: a line of text in one of the mailbox's registers
+
+  Register 0 is what runs (`report/0`), register 1 how an update goes
+  (`WebDemoNerves.Update`). Nobody listening is fine.
+  """
+  @spec tell(0..255, String.t()) :: :ok | {:error, term()}
+  def tell(register, text) do
+    with {:ok, bus} <- Circuits.I2C.open(@i2c_bus) do
+      result = Circuits.I2C.write(bus, @mailbox_address, <<register, text::binary>>)
+      Circuits.I2C.close(bus)
+      result
+    end
+  end
+
+  @doc """
+  Tell the page which firmware slot runs, which version each slot holds and
+  whether the running firmware is validated (fwup refuses to upgrade one that
+  is not): `active=a a=1.2.2 b=1.2.3 valid=1`
+  """
+  @spec report() :: :ok | {:error, term()}
+  def report() do
+    kv = Nerves.Runtime.KV.get_all()
+
+    tell(
+      0,
+      "active=#{kv["nerves_fw_active"]} a=#{kv["a.nerves_fw_version"]} b=#{kv["b.nerves_fw_version"]}" <>
+        " valid=#{if Nerves.Runtime.firmware_valid?(), do: 1, else: 0}"
+    )
+  end
+
   @impl GenServer
   def init(_opts) do
     # So that terminate/2 turns the ready LED off when the system stops
@@ -73,12 +107,21 @@ defmodule WebDemoNerves.Board do
 
   @impl GenServer
   def handle_continue(:ready, state) do
+    send(self(), :report)
     {:noreply, %{state | ready: output(@ready_led, 1)}}
   end
 
   @impl GenServer
   def handle_info({:circuits_gpio, %{ref: name, value: value}}, state) do
     Logger.info("#{name} #{if value == 1, do: "pressed", else: "released"}")
+    {:noreply, state}
+  end
+
+  # Say what runs, and again once it is validated: new firmware is validated
+  # a little after it has started (the startup guard)
+  def handle_info(:report, state) do
+    _ = report()
+    if not Nerves.Runtime.firmware_valid?(), do: Process.send_after(self(), :report, 1_000)
     {:noreply, state}
   end
 

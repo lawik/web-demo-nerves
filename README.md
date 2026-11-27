@@ -31,6 +31,16 @@ for the target:
   `BUTTON_1` to `BUTTON_3`, and `WebDemoNerves.Board.fps()` reads the page's
   frame rate from the FPS sensor at I2C address `0x10`.
 
+* `WebDemoNerves.Update`: firmware updates without a network. The page puts
+  a `.fw` file (a delta, made with fwup_delta) into the scratch area at the
+  end of the disk; `WebDemoNerves.Update.install()` hands it to fwup's
+  `upgrade` task and reboots into the other slot, and
+  `WebDemoNerves.Update.revert()` goes back. When it starts, the firmware
+  writes which slot runs and the version in each to a mailbox on I2C (`0x51`),
+  which is how the page knows what to offer.
+* Two versions, tagged `v1.2.2` and `v1.2.3`, to update between: 1.2.3 gives
+  the ready LED a heartbeat. jsnerves' disk image holds 1.2.2.
+
 Everything else is the template: Toolshed and the MOTD in
 `rootfs_overlay/etc/iex.exs`, RingLogger, and the Nerves.Runtime startup
 guard, which validates new firmware once all applications have started.
