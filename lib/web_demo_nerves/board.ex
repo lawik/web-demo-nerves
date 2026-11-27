@@ -10,7 +10,8 @@ defmodule WebDemoNerves.Board do
   GPIO lines, by name:
 
   * `LED_SLOT_A`, `LED_SLOT_B` - outputs, on for the firmware slot that runs
-  * `LED_READY` - output, on while the system is up (this application runs)
+  * `LED_READY` - output, a heartbeat while the system is up (this
+    application runs): two short beats, then a rest
   * `BUTTON_1`, `BUTTON_2`, `BUTTON_3` - inputs, 1 while pressed; presses
     are logged for now
 
@@ -28,6 +29,8 @@ defmodule WebDemoNerves.Board do
 
   @slot_leds %{"a" => "LED_SLOT_A", "b" => "LED_SLOT_B"}
   @ready_led "LED_READY"
+  # the heartbeat: on and off times in ms, repeated
+  @heartbeat [{1, 110}, {0, 130}, {1, 110}, {0, 1150}]
   @buttons ["BUTTON_1", "BUTTON_2", "BUTTON_3"]
 
   @i2c_bus "i2c-0"
@@ -108,6 +111,7 @@ defmodule WebDemoNerves.Board do
   @impl GenServer
   def handle_continue(:ready, state) do
     send(self(), :report)
+    send(self(), {:heartbeat, 0})
     {:noreply, %{state | ready: output(@ready_led, 1)}}
   end
 
@@ -122,6 +126,13 @@ defmodule WebDemoNerves.Board do
   def handle_info(:report, state) do
     _ = report()
     if not Nerves.Runtime.firmware_valid?(), do: Process.send_after(self(), :report, 1_000)
+    {:noreply, state}
+  end
+
+  def handle_info({:heartbeat, step}, %{ready: ready} = state) do
+    {level, ms} = Enum.at(@heartbeat, step)
+    if ready, do: Circuits.GPIO.write(ready, level)
+    Process.send_after(self(), {:heartbeat, rem(step + 1, length(@heartbeat))}, ms)
     {:noreply, state}
   end
 

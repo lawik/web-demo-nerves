@@ -2,7 +2,7 @@ defmodule WebDemoNerves.MixProject do
   use Mix.Project
 
   @app :web_demo_nerves
-  @version "1.2.2"
+  @version "1.2.3"
   @all_targets [:jslinux]
 
   def project do
