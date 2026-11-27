@@ -6,8 +6,12 @@ emulated by TinyEMU, compiled to WebAssembly, in a browser.
 It is a `mix nerves.new` project (nerves_bootstrap 1.17.4) with these changes
 for the target:
 
-* `jslinux` is the only target, and its system is a path dependency built
-  from source.
+* `jslinux` is the only target. Its system is the `v0.4.2` tag of
+  [underjord/nerves_system_jslinux](https://github.com/underjord/nerves_system_jslinux),
+  whose prebuilt artifact `mix deps.get` downloads (into
+  `~/.nerves/artifacts/`), so nothing is built. To change the system, use a
+  path dependency on a checkout with `nerves: [compile: true]` (see the
+  comment in `mix.exs`); that build needs Linux.
 * No networking: the browser gives the machine no network, so instead of
   `nerves_pack` it only has the part of it that is not networking,
   `nerves_motd`. No vintage_net, mdns_lite, nerves_ssh or nerves_time, and
@@ -33,16 +37,23 @@ guard, which validates new firmware once all applications have started.
 
 Sibling checkouts this expects:
 
-* `../nerves_system_jslinux` - the Nerves system (path dependency)
 * `../jsnerves` - the browser shell (TinyEMU wasm, terminal, loader)
 * `../tinyemu` - the emulator source, only needed to rebuild the wasm
 
 ## Build and run
 
 Host Erlang/Elixir are pinned in `mise.toml` (run through `mise exec --` or
-activate mise). On Ubuntu 26.04 only, Buildroot 2026.08 refuses the uutils
-`install` it ships, so put GNU coreutils first on PATH when the system has to
-be built (24.04 and earlier need nothing):
+activate mise), and Nerves needs its archive (`mix archive.install hex
+nerves_bootstrap`) and [fwup](https://github.com/fwup-home/fwup). Firmware
+builds with the prebuilt system on Linux (x86_64, aarch64) and Apple Silicon
+Macs, the hosts the riscv64 toolchain is prebuilt for. jsnerves'
+`extract_firmware.sh` uses GNU tools (`split -d`, `stat -c`, `truncate`,
+`sed -i`), so on a Mac put Homebrew's coreutils and gnu-sed `gnubin`
+directories first on PATH for it.
+
+Only when building the system from source on Ubuntu 26.04: Buildroot 2026.08
+refuses the uutils `install` it ships, so put GNU coreutils first on PATH
+(24.04 and earlier need nothing):
 
 ```sh
 mkdir -p ~/.gnu-coreutils-bin
@@ -56,7 +67,7 @@ mix deps.get
 mix firmware
 cd ../jsnerves
 ./extract_firmware.sh ../web-demo-nerves/_build/jslinux_dev/nerves/images/web_demo_nerves.fw \
-  ../nerves_system_jslinux/.nerves/artifacts/nerves_system_jslinux-portable-$(cat ../nerves_system_jslinux/VERSION)/images
+  ~/.nerves/artifacts/nerves_system_jslinux-portable-0.4.2/images
 python3 -m http.server 8000   # then open http://localhost:8000/index.html
 ```
 

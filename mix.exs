@@ -61,12 +61,14 @@ defmodule WebDemoNerves.MixProject do
 
       # Dependencies for specific targets
       # The jslinux system (Nerves on a RISC-V machine emulated by TinyEMU in
-      # a browser) is a sibling checkout that is built from source.
+      # a browser). Tags of the fork have a prebuilt artifact on its GitHub
+      # releases, which mix deps.get downloads. To build the system from a
+      # checkout instead: path: "../nerves_system_jslinux", nerves: [compile: true]
       {:nerves_system_jslinux,
-       path: "../nerves_system_jslinux",
+       github: "underjord/nerves_system_jslinux",
+       tag: "v0.4.2",
        runtime: false,
-       targets: :jslinux,
-       nerves: [compile: true]}
+       targets: :jslinux}
     ]
   end
 
