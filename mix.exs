@@ -66,7 +66,7 @@ defmodule WebDemoNerves.MixProject do
       # checkout instead: path: "../nerves_system_jslinux", nerves: [compile: true]
       {:nerves_system_jslinux,
        github: "underjord/nerves_system_jslinux",
-       tag: "v0.4.2",
+       tag: "v0.4.3",
        runtime: false,
        targets: :jslinux}
     ]

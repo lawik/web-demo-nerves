@@ -6,7 +6,7 @@ emulated by TinyEMU, compiled to WebAssembly, in a browser.
 It is a `mix nerves.new` project (nerves_bootstrap 1.17.4) with these changes
 for the target:
 
-* `jslinux` is the only target. Its system is the `v0.4.2` tag of
+* `jslinux` is the only target. Its system is the `v0.4.3` tag of
   [underjord/nerves_system_jslinux](https://github.com/underjord/nerves_system_jslinux),
   whose prebuilt artifact `mix deps.get` downloads (into
   `~/.nerves/artifacts/`), so nothing is built. To change the system, use a
@@ -70,7 +70,7 @@ mix deps.get
 mix firmware
 cd ../jsnerves
 ./extract_firmware.sh ../web-demo-nerves/_build/jslinux_dev/nerves/images/web_demo_nerves.fw \
-  ~/.nerves/artifacts/nerves_system_jslinux-portable-0.4.2/images
+  ~/.nerves/artifacts/nerves_system_jslinux-portable-0.4.3/images
 python3 -m http.server 8000   # then open http://localhost:8000/index.html
 ```
 
