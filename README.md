@@ -49,7 +49,10 @@ builds with the prebuilt system on Linux (x86_64, aarch64) and Apple Silicon
 Macs, the hosts the riscv64 toolchain is prebuilt for. jsnerves'
 `extract_firmware.sh` uses GNU tools (`split -d`, `stat -c`, `truncate`,
 `sed -i`), so on a Mac put Homebrew's coreutils and gnu-sed `gnubin`
-directories first on PATH for it.
+directories first on PATH for it. It also makes the boot snapshot the page
+restores instead of booting, with Node.js 20.11 or later and Playwright's
+headless Chromium, which it installs on first use (`--no-snapshot` skips
+it; see Snapshots in the jsnerves README).
 
 Only when building the system from source on Ubuntu 26.04: Buildroot 2026.08
 refuses the uutils `install` it ships, so put GNU coreutils first on PATH
